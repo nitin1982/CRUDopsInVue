@@ -39,7 +39,7 @@
                       <a
                         class="fa fa-trash-o"
                         style="font-size:15px"
-                        @click.prevent="deleteToDo(todo.title)"
+                        @click.prevent="deleteToDo(todo.title, todo.id)"
                       />
                     </div>
                     <div class="col-sm-5"></div>
@@ -71,6 +71,7 @@ export default {
       Header: "ToDo(s)  List",
       showConfirmation: false,
       confirmBoxMessage: "",
+      selectedToDoId: 0,
       toDos: [
         {
           userId: 1,
@@ -88,13 +89,31 @@ export default {
     };
   },
   methods: {
-    deleteToDo: function(todo) {
+    deleteToDo: function(todo, id) {
       this.showConfirmation = !this.showConfirmation;
       this.confirmBoxMessage = `Are you sure you want to delete '${todo}'`;
+      this.selectedToDoId = id;
     },
 
     deleteConfirmed: function() {
+      console.log(
+        `https://jsonplaceholder.typicode.com/todos/${this.selectedToDoId}`
+      );
       this.showConfirmation = false;
+      axios
+        .delete(
+          `https://jsonplaceholder.typicode.com/todos/${this.selectedToDoId}`
+        )
+        .then(resp => {
+          console.log(resp);
+          const index = this.toDos.map(x => x.id).indexOf(this.selectedToDoId);
+          if (index > 0) {
+            this.toDos.splice(index, 1);
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
     }
   },
   created: function() {
